@@ -1,4 +1,5 @@
 FROM python
+RUN python -m venv /venv
 COPY . /python
 WORKDIR /python
-CMD python ./script.py 
+CMD /venv/bin/python ./script.py 
