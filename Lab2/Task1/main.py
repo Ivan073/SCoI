@@ -1,5 +1,5 @@
 from Lab2.Task1.helpers import process_abbreviations
-from Lab2.Task1.parser import count_sentences
+from Lab2.Task1.parser import count_sentences, count_nondeclarative_sentences
 from input import get_text
 # ‪D:\Programming\BSUIR\SCOI\Lab2\Task1\sample.txt
 
@@ -11,7 +11,9 @@ def main():
     text = get_text()
     optimized_text = process_abbreviations(text)
     print("Text:", text)
-    print("Sentence amount: ", count_sentences(optimized_text))
+    print("Sentence amount:", count_sentences(optimized_text))
+    print("Non-declarative sentence amount:", count_nondeclarative_sentences(optimized_text))
+    print(optimized_text)
 
 
 if __name__ == '__main__':
