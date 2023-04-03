@@ -1,4 +1,4 @@
-from Task1.input import get_text
+from input import get_text
 
 
 def main():
