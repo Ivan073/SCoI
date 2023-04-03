@@ -1,3 +1,5 @@
+import re
+
 from Lab2.Task1 import constants
 
 
@@ -20,3 +22,10 @@ def process_abbreviations(text: str) -> str:
     text = ' '.join(word_list)
 
     return text
+
+
+def get_words_list(text: str) -> list[str]:
+    """List of words from text"""
+    word_list = re.split(r"\.|,|:|\\n|\s|;|!|\?|\"|\(|\)", text)
+    return [word for word in word_list if not (word.isnumeric() or (word == ''))]
+
