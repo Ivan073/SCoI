@@ -15,6 +15,8 @@ def process_abbreviations(text: str) -> str:
         if word in constants.END_OF_SENTENCE_ABBREVIATIONS and index+1 != len(word_list) and\
                 word_list[index+1][0].islower():
             word_list[index] = word.replace('.', '')
+        elif word in constants.END_OF_SENTENCE_ABBREVIATIONS:
+            word_list[index] = word.replace('.', '')+'.'
     text = ' '.join(word_list)
 
     return text
