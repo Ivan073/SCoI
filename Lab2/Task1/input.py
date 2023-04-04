@@ -37,8 +37,35 @@ def input_path() -> str:
 
 
 def load_file() -> str:
-    """Returns text from file, gets path from input"""
+    """ Returns text from file, gets path from input """
     file_path = input_path()
 
     with open(file_path, 'r', encoding='utf8') as file:
         return file.read()
+
+
+def get_k_n() -> str:
+    """ Returns k,n depending on chosen option """
+
+    if get_option(['1', '2']) == '1':
+        return 10, 4
+    else:
+        return read_k_n()
+
+
+def read_k_n() -> str:
+    """ Reads k,n from input """
+
+    while True:
+        k = input('Input k: ')
+        if not k.isnumeric():
+            print('Wrong input')
+        else:
+            break
+
+    while True:
+        n = input('Input n: ')
+        if not n.isnumeric():
+            print('Wrong input')
+        else:
+            return k, n

@@ -5,7 +5,7 @@ from Lab2.Task1 import constants
 
 def process_abbreviations(text: str) -> str:
     """Remove all dots in middle sentence abbreviations,
-        Remove dots in rest of abbreviations if next word starts with capital.
+        Remove dots in rest of abbreviations, if next word starts with capital add a dot.
         In process also handles transition to next line, changing it to space.
         """
 
