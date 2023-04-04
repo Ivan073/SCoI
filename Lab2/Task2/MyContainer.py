@@ -43,8 +43,11 @@ class MyContainer:
             pickle.dump(self.collection, f)
 
     def load(self, path):
-        with open(path, 'rb') as f:
-            self.collection = pickle.load(f)
+        try:
+            with open(path, 'rb') as f:
+                self.collection = pickle.load(f)
+        except FileNotFoundError:
+            print("Cannot load file")
 
 
 
