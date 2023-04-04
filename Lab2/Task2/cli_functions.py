@@ -1,16 +1,16 @@
 import re
 
 from Lab2.Task2.MyContainer import MyContainer
-from Lab2.Task2.containers import CONTAINERS
+from Lab2.Task2.containers import save_users
 
 
-def get_user_and_container() -> (str, MyContainer):
+def get_user_and_container(users: set) -> (str, MyContainer):
     """ Gets user and related container """
 
     container = MyContainer()
     username = input("Input username:")
-    if not (username in CONTAINERS):
-        print("User not found. New user with new container created")
+    if not (username in users):
+        print("User not found. New user with new container initialized")
     else:
         print("User found. Use existing container or create new?")
         print("1. Use existing")
@@ -22,15 +22,16 @@ def get_user_and_container() -> (str, MyContainer):
                 container.load("collections/" + username + ".bin")
                 break
             elif option == "2":
+                container = MyContainer()
                 break
             print("Wrong input")
     return username, container
 
 
-def process_cli():
+def process_cli(users: set):
     """ Processes CLI input """
 
-    username, container = get_user_and_container()
+    username, container = get_user_and_container(users)
 
     while True:
         raw_input = input("Input command:")
@@ -74,6 +75,8 @@ def process_cli():
 
             case "save":
                 container.save("collections/" + username + ".bin")
+                users.add(username)
+                save_users(users)
 
             case "load":
                 container.load("collections/" + username + ".bin")
@@ -90,9 +93,10 @@ def process_cli():
                         container.save("collections/" + username + ".bin")
                         break
                     elif option == "2":
+                        container = MyContainer()
                         break
                     print("Wrong input")
 
-                username, container = get_user_and_container()
+                username, container = get_user_and_container(users)
             case _:
                 print("Unrecognizable command")
