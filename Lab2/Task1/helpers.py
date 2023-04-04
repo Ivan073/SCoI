@@ -24,8 +24,14 @@ def process_abbreviations(text: str) -> str:
     return text
 
 
-def get_words_list(text: str) -> list[str]:
+def get_word_list(text: str) -> list[str]:
     """List of words from text"""
     word_list = re.split(r"\.|,|:|\\n|\s|;|!|\?|\"|\(|\)", text)
+    return [word for word in word_list if not (word.isnumeric() or (word == ''))]
+
+
+def get_sentence_list(text: str) -> list[str]:
+    """List of sentences from text"""
+    word_list = re.split(r"\.|!|\?", text)
     return [word for word in word_list if not (word.isnumeric() or (word == ''))]
 
