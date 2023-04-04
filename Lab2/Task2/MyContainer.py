@@ -5,9 +5,6 @@ class MyContainer:
     def __init__(self, collection=set()):
         self.collection = collection
 
-    def add(self, item):
-        self.collection.add(item)
-
     def add(self, items: list):
         for item in items:
             self.collection.add(item)
@@ -17,12 +14,6 @@ class MyContainer:
             self.collection.remove(item)
         except KeyError:
             print("Item not found. Item not removed")
-
-    def find(self, item):
-        if item in self.collection:
-            print(item, "found")
-        else:
-            print("No such elements")
 
     def find(self, items: list):
         flag = True

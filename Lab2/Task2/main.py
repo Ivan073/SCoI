@@ -1,10 +1,14 @@
 from Lab2.Task2.MyContainer import MyContainer
-from Lab2.Task2.cli_functions import get_user_and_container
+from Lab2.Task2.cli_functions import get_user_and_container, process_cli
 from Lab2.Task2.containers import CONTAINERS
 
 
 def main():
-    username, container = get_user_and_container()
+    process_cli()
+
+
+
+
 
     container.list()
     print()
