@@ -1,14 +1,10 @@
 from Lab2.Task2.MyContainer import MyContainer
+from Lab2.Task2.cli_functions import get_user_and_container
+from Lab2.Task2.containers import CONTAINERS
 
 
 def main():
-    containers = {"user123": MyContainer({"1", "2", "3"})}
-    username = input("Input username:")
-    if not (username in containers):
-        print("User not found. New user with new container created")
-        containers[username] = MyContainer()
-
-    container = containers[username]
+    username, container = get_user_and_container()
 
     container.list()
     print()
@@ -40,6 +36,7 @@ def main():
     print()
 
     container.grep(r"...a")
+
 
 if __name__ == '__main__':
     main()
