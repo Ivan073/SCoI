@@ -1,3 +1,4 @@
+import pickle
 import re
 
 
@@ -36,6 +37,14 @@ class MyContainer:
                 print(item, "found")
         if flag:
             print("No such elements")
+
+    def save(self, path):
+        with open(path, 'wb') as f:
+            pickle.dump(self.collection, f)
+
+    def load(self, path):
+        with open(path, 'rb') as f:
+            self.collection = pickle.load(f)
 
 
 

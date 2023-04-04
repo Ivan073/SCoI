@@ -68,5 +68,9 @@ def process_cli():
                     print("Unrecognizable command")
             case "grep":
                 container.grep(data)
+            case "save":
+                container.save("collections/" + username + ".bin")
+            case "load":
+                container.load("collections/" + username + ".bin")
             case _:
                 print("Unrecognizable command")
