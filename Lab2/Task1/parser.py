@@ -29,3 +29,13 @@ def count_average_length_of_sentences(text: str) -> int:
     sentences = get_sentence_list(text)
     words = get_word_list(text)
     return len(words)/len(sentences)
+
+
+def count_average_length_of_words(text: str) -> int:
+    """Average length of words in text"""
+    words = get_word_list(text)
+    total_length = 0
+    for word in words:
+        total_length += len(word)
+
+    return total_length/len(words)
