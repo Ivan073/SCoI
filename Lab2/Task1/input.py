@@ -62,10 +62,12 @@ def read_k_n() -> str:
             print('Wrong input')
         else:
             break
+    k=int(k)
 
     while True:
         n = input('Input n: ')
         if not n.isnumeric():
             print('Wrong input')
         else:
+            n = int(n)
             return k, n

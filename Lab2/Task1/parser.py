@@ -39,3 +39,10 @@ def count_average_length_of_words(text: str) -> int:
         total_length += len(word)
 
     return total_length/len(words)
+
+
+def top_k_ngrams(text: str, k: int, n: int) -> int:
+    words = get_word_list(text)
+    ngrams = tuple(" ".join(words[i:i + n]) for i in range(len(words) - (n - 1)))
+    sorted_unique_ngrams = sorted(set(ngrams), key=ngrams.count, reverse=True)
+    return sorted_unique_ngrams[:k]

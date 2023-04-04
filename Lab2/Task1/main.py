@@ -1,6 +1,6 @@
 from Lab2.Task1.helpers import process_abbreviations, get_word_list, get_sentence_list
 from Lab2.Task1.parser import count_sentences, count_nondeclarative_sentences, count_average_length_of_sentences, \
-    count_average_length_of_words
+    count_average_length_of_words, top_k_ngrams
 from input import get_text, get_k_n
 
 
@@ -24,6 +24,7 @@ def main():
     print("Non-declarative sentence amount:", count_nondeclarative_sentences(optimized_text))
     print("Average sentence length:", count_average_length_of_sentences(optimized_text))
     print("Average word length:", count_average_length_of_words(optimized_text))
+    print("Top k n-grams:", top_k_ngrams(optimized_text, k, n))
 
 
 if __name__ == '__main__':
