@@ -4,7 +4,7 @@ from parser import count_sentences, count_nondeclarative_sentences, count_averag
 from input import get_text, get_k_n
 
 
-# ‪D:\Programming\BSUIR\SCOI\Lab2\Task1\sample.txt
+# ‪D:\Programming\BSUIR\SCOI\Lab2\Task1Docker\Task1\sample.txt
 
 
 def main():

@@ -3,7 +3,9 @@ import re
 
 
 class MyContainer:
-    def __init__(self, collection=set()):
+    def __init__(self, collection=None):
+        if collection is None:
+            collection = set()
         self.collection = collection
 
     def add(self, items: list):
@@ -45,7 +47,7 @@ class MyContainer:
     def load(self, path):
         try:
             with open(path, 'rb') as f:
-                self.collection = pickle.load(f)
+                self.collection.update(pickle.load(f))
         except FileNotFoundError:
             print("Cannot load file")
 

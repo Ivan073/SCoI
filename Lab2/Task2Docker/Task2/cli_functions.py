@@ -8,6 +8,7 @@ def get_user_and_container(users: set) -> (str, MyContainer):
     """ Gets user and related container """
 
     container = MyContainer()
+    container.list()
     username = input("Input username:")
     if not (username in users):
         print("User not found. New user with new container initialized")
@@ -48,7 +49,7 @@ def process_cli(users: set):
 
         match command:
             case "add":
-                if re.fullmatch(r"\[.*\]",data):
+                if re.fullmatch(r"\[.*\]", data):
                     data = [item for item in re.split(r"\[|\]|,|\s", data) if item != '']
                     container.add(data)
                 else:
@@ -74,12 +75,18 @@ def process_cli(users: set):
                 container.grep(data)
 
             case "save":
-                container.save("collections/" + username + ".bin")
-                users.add(username)
-                save_users(users)
+                if data.replace(" ", '') == '':
+                    container.save("collections/" + username + ".bin")
+                    users.add(username)
+                    save_users(users)
+                else:
+                    print("Unrecognizable command")
 
             case "load":
-                container.load("collections/" + username + ".bin")
+                if data.replace(" ", '') == '':
+                    container.load("collections/" + username + ".bin")
+                else:
+                    print("Unrecognizable command")
 
             case "switch":
 

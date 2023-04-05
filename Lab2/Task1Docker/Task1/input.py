@@ -44,7 +44,7 @@ def load_file() -> str:
         return file.read()
 
 
-def get_k_n() -> str:
+def get_k_n() -> tuple:
     """ Returns k,n depending on chosen option """
 
     if get_option(['1', '2']) == '1':
@@ -53,7 +53,7 @@ def get_k_n() -> str:
         return read_k_n()
 
 
-def read_k_n() -> str:
+def read_k_n() -> tuple:
     """ Reads k,n from input """
 
     while True:
@@ -62,7 +62,7 @@ def read_k_n() -> str:
             print('Wrong input')
         else:
             break
-    k=int(k)
+    k = int(k)
 
     while True:
         n = input('Input n: ')
