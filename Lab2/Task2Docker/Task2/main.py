@@ -1,5 +1,5 @@
-from Lab2.Task2.cli_functions import process_cli
-from Lab2.Task2.containers import load_users
+from cli_functions import process_cli
+from containers import load_users
 
 
 def main():

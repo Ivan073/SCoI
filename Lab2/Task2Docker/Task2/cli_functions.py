@@ -1,7 +1,7 @@
 import re
 
-from Lab2.Task2.MyContainer import MyContainer
-from Lab2.Task2.containers import save_users
+from MyContainer import MyContainer
+from containers import save_users
 
 
 def get_user_and_container(users: set) -> (str, MyContainer):

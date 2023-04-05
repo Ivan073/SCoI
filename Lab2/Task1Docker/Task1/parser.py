@@ -1,6 +1,6 @@
 import re
 
-from Lab2.Task1.helpers import get_sentence_list, get_word_list
+from helpers import get_sentence_list, get_word_list
 
 
 def count_sentences(text: str) -> int:

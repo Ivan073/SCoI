@@ -1,5 +1,5 @@
-from Lab2.Task1.helpers import process_abbreviations, get_word_list, get_sentence_list
-from Lab2.Task1.parser import count_sentences, count_nondeclarative_sentences, count_average_length_of_sentences, \
+from helpers import process_abbreviations
+from parser import count_sentences, count_nondeclarative_sentences, count_average_length_of_sentences, \
     count_average_length_of_words, top_k_ngrams
 from input import get_text, get_k_n
 

@@ -49,7 +49,7 @@ class TestCountSentences(unittest.TestCase):
     def test_word_length(self):
         self.assertEqual(parser.count_average_length_of_words("A"), 1)
         self.assertEqual(parser.count_average_length_of_words("AAAAAAAAAAAAAAAAH"), 17)
-        self.assertEqual(parser.count_average_length_of_words("how much is that"), 13/4)
+        self.assertEqual(parser.count_average_length_of_words("how much is that"), 13 / 4)
 
     def test_k_ngrams(self):
         self.assertEqual(parser.top_k_ngrams(

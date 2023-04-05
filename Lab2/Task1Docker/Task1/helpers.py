@@ -1,6 +1,5 @@
 import re
-
-from Lab2.Task1 import constants
+import constants
 
 
 def process_abbreviations(text: str) -> str:
