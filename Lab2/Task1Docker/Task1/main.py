@@ -1,6 +1,7 @@
 from helpers import process_abbreviations
-from parser import count_sentences, count_nondeclarative_sentences, count_average_length_of_sentences, \
-    count_average_length_of_words, top_k_ngrams
+from parser import (count_sentences, count_nondeclarative_sentences,
+                    count_average_length_of_sentences,
+                    count_average_length_of_words, top_k_ngrams)
 from input import get_text, get_k_n
 
 
