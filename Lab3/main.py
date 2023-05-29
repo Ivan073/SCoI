@@ -1,4 +1,4 @@
-from serialization_helper import serialize_function, deserialize_function
+from serialization_helper import serialize_function, deserialize_function, serialize_class, deserialize_class
 
 
 def test():
@@ -36,12 +36,10 @@ class NewClass():
     pass
 
 
-result = serialize_function(test3)
+
+
+result = serialize_function(test4)
 print(result)
 new_func = deserialize_function(result)
-print(test3(5))
-print(new_func(5))
-
-print()
-# for line in serialize_function(new_func):
-#     print(line, result[line])
+print(test4())
+print(new_func())

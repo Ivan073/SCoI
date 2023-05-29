@@ -12,11 +12,12 @@ def serialize_function(func):
             serialized_globals[name] = ""
         elif isinstance(value, type) \
                 and name in func.__code__.co_names:  # global classes that need to be serialized
-            pass
+            serialized_globals[name] = serialize_class(value)
         elif callable(value) and name in func.__code__.co_names:  # global functions that need to be serialized
             serialized_globals[name] = serialize_function(value)
 
     serialized_func = {
+        '.type': "function",
         'name': func.__name__,  # name of function
         'argcount': func.__code__.co_argcount,  # number of arguments
         'posonlyargcount': func.__code__.co_posonlyargcount,  # number of positional arguments
@@ -69,7 +70,10 @@ def deserialize_function(serialized_func):
         if name == serialized_func['name']:
             recursive = True
         elif not isinstance(value, (int, float, str)):  # deserialization of the rest objects
-            serialized_func['globals'][name] = deserialize_function(value)
+            if value['.type'] == "function":
+                serialized_func['globals'][name] = deserialize_function(value)
+            elif value['.type'] == "class":
+                serialized_func['globals'][name] = deserialize_class(value)
 
     deserialized_func = types.FunctionType(
         deserialized_code,
@@ -88,7 +92,7 @@ def deserialize_function(serialized_func):
 def serialize_class(target):
     # Serialize the class's code object to dictionary
 
-    serialized_methods = {}         # serialize methods and static fields
+    serialized_methods = {}         # serialize attributes
     for name, value in target.__dict__.items():
         if isinstance(value, (int, float, str)):
             serialized_methods[name] = value
@@ -102,8 +106,9 @@ def serialize_class(target):
             serialized_bases.append(serialize_class(value))
 
     serialized_class = {
+        '.type': "class",
         "name": target.__name__,
-        "methods": serialized_methods,
+        "attrs": serialized_methods,
         "bases": serialized_bases
     }
     return serialized_class
@@ -111,13 +116,15 @@ def serialize_class(target):
 
 def deserialize_class(serialized_target):
     # Deserialize the class's code object from dictionary
-    for name, value in serialized_target["methods"].items():
+    for name, value in serialized_target["attrs"].items():
         if not isinstance(value, (int, float, str)):
-            serialized_target["methods"][name] = deserialize_function(value)
+            serialized_target["attrs"][name] = deserialize_function(value)
 
     for i, value in enumerate(serialized_target["bases"]):
         serialized_target["bases"][i] = deserialize_class(value)
 
-    deserialized_class = type(serialized_target["name"], tuple(serialized_target["bases"]), serialized_target["methods"])
+    deserialized_class = type(serialized_target["name"],
+                              tuple(serialized_target["bases"]),
+                              serialized_target["attrs"])
 
     return deserialized_class
