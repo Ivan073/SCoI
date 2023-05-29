@@ -1,4 +1,5 @@
-from serialization_helper import serialize_function, deserialize_function, serialize_class, deserialize_class
+from serialization_helper import serialize_function, deserialize_function, serialize_class, deserialize_class, \
+    serialize_object, deserialize_object
 
 
 def test():
@@ -40,8 +41,24 @@ class OtherClass():
     pass
 
 
+class Person:
+    b = 3
 
-result = serialize_class(OtherClass)
-print(result)
-new_class = deserialize_class(result)
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
 
+    def test(self):
+        print("text")
+        print(self.name, self.age)
+
+
+person = Person("1", 1)
+
+ser_obj = serialize_object(person)
+print("serialized ",ser_obj)
+new_person = deserialize_object(ser_obj)
+print(person)
+print(new_person)
+person.test()
+new_person.test()

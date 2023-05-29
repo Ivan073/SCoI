@@ -64,7 +64,6 @@ def deserialize_function(serialized_func):
         serialized_func['cellvars'],
     )
 
-    print(serialized_func['globals'])
     recursive = False
     for name, value in serialized_func['globals'].items():  # editing non-primitive globals
         if name == serialized_func['name']:
@@ -90,7 +89,7 @@ def deserialize_function(serialized_func):
 
 
 def serialize_class(target):
-    # Serialize the class's code object to dictionary
+    # Serialize the class object to dictionary
 
     serialized_attrs = {}         # serialize attributes
     for name, value in target.__dict__.items():
@@ -117,7 +116,7 @@ def serialize_class(target):
 
 
 def deserialize_class(serialized_target):
-    # Deserialize the class's code object from dictionary
+    # Deserialize the class object from dictionary
     for name, value in serialized_target["attrs"].items():
         if not isinstance(value, (int, float, str)):
             if value['.type'] == "function":
@@ -133,3 +132,36 @@ def deserialize_class(serialized_target):
                               serialized_target["attrs"])
 
     return deserialized_class
+
+
+def serialize_object(obj):
+    # Serialize object (as class with data) to dictionary
+
+    serialized_dict = {}
+    for name, value in obj.__dict__.items():
+        if isinstance(value, (int, float, str)):
+            serialized_dict[name] = value
+        elif isinstance(value, type):
+            serialized_dict[name] = serialize_class(value)
+        elif callable(value):
+            serialized_dict[name] = serialize_function(value)
+        else:
+            serialized_dict[name] = serialize_object(value)
+
+    serialized_obj = {
+        ".type": 'object',
+        "class": serialize_class(type(obj)),
+        "dict": serialized_dict
+    }
+    return serialized_obj
+
+
+def deserialize_object(serialized_obj):
+    # Deserialize object from dictionary
+
+    obj_class = deserialize_class(serialized_obj["class"])
+    obj = obj_class.__new__(obj_class)
+
+    for name, value in serialized_obj["dict"].items():
+        setattr(obj, name, value)
+    return obj
