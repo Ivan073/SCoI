@@ -1,36 +1,36 @@
 import types
 
+
 def serialize_function(func):
-    #   Serialize the function's code object
+    #   Serialize the function's code object to dictionary
 
     serialized_globals = {}
     for name, value in func.__globals__.items():
-        if isinstance(value, (int, float, str)):   # primitive globals
+        if isinstance(value, (int, float, str)):  # primitive globals
             serialized_globals[name] = value
-        elif name == func.__name__:                   # recursive call will be changed to new instance of function
+        elif name == func.__name__:  # recursive call will be changed to new instance of function
             serialized_globals[name] = ""
-        elif isinstance(value,type) \
-                and name in func.__code__.co_names:    #  global classes that also need to be serialized
-                pass
-        elif callable(value) and name in func.__code__.co_names:    #  global functions that  need to be serialized
+        elif isinstance(value, type) \
+                and name in func.__code__.co_names:  # global classes that need to be serialized
+            pass
+        elif callable(value) and name in func.__code__.co_names:  # global functions that need to be serialized
             serialized_globals[name] = serialize_function(value)
 
-
     serialized_func = {
-        'name': func.__name__,                       # name of function
-        'argcount': func.__code__.co_argcount,       # number of arguments
+        'name': func.__name__,  # name of function
+        'argcount': func.__code__.co_argcount,  # number of arguments
         'posonlyargcount': func.__code__.co_posonlyargcount,  # number of positional arguments
-        'kwonlyargcount': func.__code__.co_kwonlyargcount,    # number of key arguments
-        'nlocals': func.__code__.co_nlocals,         # number of locals
-        'stacksize': func.__code__.co_stacksize, # potential used stacksize (not useful)
-        'flags': func.__code__.co_flags,        # code state flags
-        'code': func.__code__.co_code,          # code of function as bytecode
-        'consts': func.__code__.co_consts,      # values of consts
-        'names': func.__code__.co_names,        # names of globals and atributes in function code (includes functions)
+        'kwonlyargcount': func.__code__.co_kwonlyargcount,  # number of key arguments
+        'nlocals': func.__code__.co_nlocals,  # number of locals
+        'stacksize': func.__code__.co_stacksize,  # potential used stack size (not useful)
+        'flags': func.__code__.co_flags,  # code state flags
+        'code': func.__code__.co_code,  # code of function as bytecode
+        'consts': func.__code__.co_consts,  # values of consts
+        'names': func.__code__.co_names,  # names of globals and attributes in function code (includes functions)
         'varnames': func.__code__.co_varnames,  # names of variables
-        'filename': func.__code__.co_filename,  # name of file (not neccessary)
-        'firstlineno': func.__code__.co_firstlineno, # position in code (not neccessary)
-        'lnotab': func.__code__.co_lnotab,      # offset info for bytecode
+        'filename': func.__code__.co_filename,  # name of file (not necessary)
+        'firstlineno': func.__code__.co_firstlineno,  # position in code (not necessary)
+        'lnotab': func.__code__.co_lnotab,  # offset info for bytecode
         'freevars': func.__code__.co_freevars,  # vars used in internal functions
         'cellvars': func.__code__.co_cellvars,  # vars used in internal functions
 
@@ -38,15 +38,12 @@ def serialize_function(func):
         'argdefs': func.__defaults__,
         'closure': func.__closure__
     }
-    # print( func.__code__.co_names)
-    # print(globals())
-    # print(serialized_globals)
 
     return serialized_func
 
 
 def deserialize_function(serialized_func):
-    # Deserialize the function's code object
+    # Deserialize the function's code object from dictionary
     deserialized_code = types.CodeType(
         serialized_func['argcount'],
         serialized_func['posonlyargcount'],
@@ -68,12 +65,11 @@ def deserialize_function(serialized_func):
 
     print(serialized_func['globals'])
     recursive = False
-    for name, value in serialized_func['globals'].items():   # editing non-primitive globals
+    for name, value in serialized_func['globals'].items():  # editing non-primitive globals
         if name == serialized_func['name']:
             recursive = True
-        elif not isinstance(value, (int, float, str)):      # deserialization of the rest objects
+        elif not isinstance(value, (int, float, str)):  # deserialization of the rest objects
             serialized_func['globals'][name] = deserialize_function(value)
-
 
     deserialized_func = types.FunctionType(
         deserialized_code,
@@ -87,3 +83,41 @@ def deserialize_function(serialized_func):
         deserialized_func.__globals__[serialized_func['name']] = deserialized_func
 
     return deserialized_func
+
+
+def serialize_class(target):
+    # Serialize the class's code object to dictionary
+
+    serialized_methods = {}         # serialize methods and static fields
+    for name, value in target.__dict__.items():
+        if isinstance(value, (int, float, str)):
+            serialized_methods[name] = value
+        if callable(value):
+            serialized_methods[name] = serialize_function(value)
+
+    serialized_bases = []           # serialize base classes
+    for value in target.__bases__:
+        if value.__bases__ != ():        # exclude 'object' class
+            print("class", value)
+            serialized_bases.append(serialize_class(value))
+
+    serialized_class = {
+        "name": target.__name__,
+        "methods": serialized_methods,
+        "bases": serialized_bases
+    }
+    return serialized_class
+
+
+def deserialize_class(serialized_target):
+    # Deserialize the class's code object from dictionary
+    for name, value in serialized_target["methods"].items():
+        if not isinstance(value, (int, float, str)):
+            serialized_target["methods"][name] = deserialize_function(value)
+
+    for i, value in enumerate(serialized_target["bases"]):
+        serialized_target["bases"][i] = deserialize_class(value)
+
+    deserialized_class = type(serialized_target["name"], tuple(serialized_target["bases"]), serialized_target["methods"])
+
+    return deserialized_class
