@@ -92,12 +92,14 @@ def deserialize_function(serialized_func):
 def serialize_class(target):
     # Serialize the class's code object to dictionary
 
-    serialized_methods = {}         # serialize attributes
+    serialized_attrs = {}         # serialize attributes
     for name, value in target.__dict__.items():
         if isinstance(value, (int, float, str)):
-            serialized_methods[name] = value
-        if callable(value):
-            serialized_methods[name] = serialize_function(value)
+            serialized_attrs[name] = value
+        elif isinstance(value, type):               # static class attributes
+            serialized_attrs[name] = serialize_class(value)
+        elif callable(value):
+            serialized_attrs[name] = serialize_function(value)
 
     serialized_bases = []           # serialize base classes
     for value in target.__bases__:
@@ -108,7 +110,7 @@ def serialize_class(target):
     serialized_class = {
         '.type': "class",
         "name": target.__name__,
-        "attrs": serialized_methods,
+        "attrs": serialized_attrs,
         "bases": serialized_bases
     }
     return serialized_class
@@ -118,7 +120,10 @@ def deserialize_class(serialized_target):
     # Deserialize the class's code object from dictionary
     for name, value in serialized_target["attrs"].items():
         if not isinstance(value, (int, float, str)):
-            serialized_target["attrs"][name] = deserialize_function(value)
+            if value['.type'] == "function":
+                serialized_target["attrs"][name] = deserialize_function(value)
+            elif value['.type'] == "class":
+                serialized_target["attrs"][name] = deserialize_class(value)
 
     for i, value in enumerate(serialized_target["bases"]):
         serialized_target["bases"][i] = deserialize_class(value)

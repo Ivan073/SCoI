@@ -35,11 +35,13 @@ def test4():
 class NewClass():
     pass
 
+class OtherClass():
+    static = NewClass
+    pass
 
 
 
-result = serialize_function(test4)
+result = serialize_class(OtherClass)
 print(result)
-new_func = deserialize_function(result)
-print(test4())
-print(new_func())
+new_class = deserialize_class(result)
+
