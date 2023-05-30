@@ -1,7 +1,8 @@
 import math
 
 from serialization_helper import serialize_function, deserialize_function, serialize_class, deserialize_class, \
-    serialize_object, deserialize_object, serialize_module, deserialize_module, serialize_all, deserialize_all
+    serialize_object, deserialize_object, serialize_module, deserialize_module, serialize_all, deserialize_all, \
+    serialize_collection, deserialize_collection
 
 
 def test():
@@ -108,7 +109,10 @@ def outer_function(x):
 closure = outer_function(10)
 
 
-
-ser_obj = serialize_all(Person)
+var = Person
+#print(var.items())
+ser_obj = serialize_all(var)
+print(ser_obj)
 new_obj = deserialize_all(ser_obj)
 print(new_obj)
+print(type(new_obj))

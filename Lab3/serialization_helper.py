@@ -1,5 +1,6 @@
 import importlib
 import types
+from collections.abc import Iterable
 
 
 def serialize_function(func):
@@ -8,7 +9,7 @@ def serialize_function(func):
     for name, value in func.__globals__.items():
         if isinstance(value, (int, float, str)):  # primitive globals
             serialized_globals[name] = value
-        if isinstance(value, types.ModuleType):  # module serialization
+        elif isinstance(value, types.ModuleType):  # module serialization
             serialized_globals[name] = serialize_module(value)
         elif name == func.__name__ and name in func.__code__.co_names:
             # recursive call will be changed to new instance of function
@@ -211,10 +212,13 @@ def deserialize_module(serialized_module):
     module = importlib.import_module(serialized_module['name'])
     return module
 
+
 def serialize_all(obj):
-    if isinstance(obj, (int, float, str)):  # primitive globals
+    if isinstance(obj, (int, float, str, complex)):  # primitive globals
         return obj
-    if isinstance(obj, types.ModuleType):  # module serialization
+    elif isinstance(obj, Iterable):
+        return serialize_collection(obj)
+    elif isinstance(obj, types.ModuleType):  # module serialization
         return serialize_module(obj)
     elif isinstance(obj, type):           # class serialization
         return serialize_class(obj)
@@ -223,9 +227,12 @@ def serialize_all(obj):
     else:
         return serialize_object(obj)
 
+
 def deserialize_all(obj):
     if isinstance(obj, (int, float, str)):
         return obj
+    elif obj['.type'] in ["list", "bytes", "tuple", "dict", "set"]:
+        return deserialize_collection(obj)
     elif obj['.type'] == "function":
         return deserialize_function(obj)
     elif obj['.type'] == "class":
@@ -236,3 +243,45 @@ def deserialize_all(obj):
         return deserialize_module(obj)
     else:
         raise Exception("Wrong deserializable object")
+
+
+def serialize_collection(col):
+    # Serialize collection as dictionary
+
+    ser_col = []
+    if isinstance(col, list):
+        type = 'list'
+        ser_col = [serialize_all(val) for val in col]
+    elif isinstance(col, set):
+        type = 'set'
+        ser_col = [serialize_all(val) for val in col]
+    elif isinstance(col, dict):
+        type = 'dict'
+        ser_col = [[serialize_all(key), serialize_all(val)] for key, val in col.items()]
+    elif isinstance(col, tuple):
+        type = 'tuple'
+        ser_col = [serialize_all(val) for val in col]
+    elif isinstance(col, bytes):
+        type = 'bytes'
+        ser_col = [serialize_all(val) for val in col]
+
+    serialized_module = {
+        ".type": type,
+        "collection": ser_col,
+    }
+    return serialized_module
+
+
+def deserialize_collection(serialized_col):
+    # Deserialize collection as dictionary
+
+    if serialized_col['.type'] == "list":
+        return serialized_col['collection']
+    elif serialized_col['.type'] == "set":
+        return set(serialized_col['collection'])
+    elif serialized_col['.type'] == "dict":
+        return dict(serialized_col['collection'])
+    elif serialized_col['.type'] == "tuple":
+        return tuple(serialized_col['collection'])
+    elif serialized_col['.type'] == "bytes":
+        return bytes(serialized_col['collection'])
