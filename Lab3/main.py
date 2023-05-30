@@ -1,7 +1,7 @@
 import math
 
 from serialization_helper import serialize_function, deserialize_function, serialize_class, deserialize_class, \
-    serialize_object, deserialize_object, serialize_module, deserialize_module
+    serialize_object, deserialize_object, serialize_module, deserialize_module, serialize_all, deserialize_all
 
 
 def test():
@@ -100,10 +100,15 @@ class HasModule:
         self.other_module = math
 
 
+def outer_function(x):
+    def inner_function(y):
+        return x + y
+    return inner_function
+
+closure = outer_function(10)
 
 
-ser_obj = serialize_object(HasModule())
-new_obj = deserialize_object(ser_obj)
 
-print(HasModule().other_module)
-print(new_obj.other_module)
+ser_obj = serialize_all(Person)
+new_obj = deserialize_all(ser_obj)
+print(new_obj)

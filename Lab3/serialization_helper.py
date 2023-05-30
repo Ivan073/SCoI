@@ -210,3 +210,29 @@ def deserialize_module(serialized_module):
     # Deserialize module from dictionary (i. e import again by name)
     module = importlib.import_module(serialized_module['name'])
     return module
+
+def serialize_all(obj):
+    if isinstance(obj, (int, float, str)):  # primitive globals
+        return obj
+    if isinstance(obj, types.ModuleType):  # module serialization
+        return serialize_module(obj)
+    elif isinstance(obj, type):           # class serialization
+        return serialize_class(obj)
+    elif callable(obj):                     # function serialization
+        return serialize_function(obj)
+    else:
+        return serialize_object(obj)
+
+def deserialize_all(obj):
+    if isinstance(obj, (int, float, str)):
+        return obj
+    elif obj['.type'] == "function":
+        return deserialize_function(obj)
+    elif obj['.type'] == "class":
+        return deserialize_class(obj)
+    elif obj['.type'] == "object":
+        return deserialize_object(obj)
+    elif obj['.type'] == "module":
+        return deserialize_module(obj)
+    else:
+        raise Exception("Wrong deserializable object")
