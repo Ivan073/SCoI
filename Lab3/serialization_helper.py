@@ -167,7 +167,7 @@ def deserialize_module(serialized_module):
 
 
 def serialize_all(obj):
-    if isinstance(obj, (int, float, str, complex)):  # primitive globals
+    if isinstance(obj, (int, float, str, complex, type(None))):  # primitive globals
         return obj
     elif isinstance(obj, Iterable):
         return serialize_collection(obj)
@@ -182,7 +182,7 @@ def serialize_all(obj):
 
 
 def deserialize_all(obj):
-    if isinstance(obj, (int, float, str)):
+    if isinstance(obj, (int, float, str, type(None))):
         return obj
     elif obj['.type'] in ["list", "bytes", "tuple", "dict", "set"]:
         return deserialize_collection(obj)
@@ -203,8 +203,9 @@ def serialize_collection(col):
 
     ser_col = []
     if isinstance(col, list):
-        type = 'list'
-        ser_col = [serialize_all(val) for val in col]
+        return col
+        #type = 'list'
+       # ser_col = [serialize_all(val) for val in col]
     elif isinstance(col, set):
         type = 'set'
         ser_col = [serialize_all(val) for val in col]
