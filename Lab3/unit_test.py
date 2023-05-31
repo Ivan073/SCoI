@@ -139,7 +139,28 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(json_helper.serialized_to_json("test"), "\'test\'")  # string test
         self.assertEqual(json_helper.serialized_to_json(None), "null")  # null test
         self.assertEqual(json_helper.serialized_to_json([1,2,3]), "[1, 2, 3]")  # list test
-        self.assertEqual(json_helper.serialized_to_json({"val":1 , "val2": 2}), "{\'val\': 1, \'val2\': 2}")  # dict test
+        self.assertEqual(json_helper.serialized_to_json(
+            {"val": 1, "val2": 2}), "{\'val\': 1, \'val2\': 2}")   # dict test
+
+        self.assertEqual(json_helper.json_to_serialized('1'), 1)  # int test
+        self.assertEqual(json_helper.json_to_serialized('-3.64'), -3.64)  # float test
+        self.assertEqual(json_helper.json_to_serialized('\'test\''), 'test')  # string test
+        self.assertEqual(json_helper.json_to_serialized('null'), None)  # null test
+        self.assertEqual(json_helper.json_to_serialized('False'), False)  # bool test
+        self.assertEqual(json_helper.json_to_serialized('[[1, 2], \'te,st\', {\'1\': 1}, [1, 3]]'),
+                         [[1, 2], 'te,st', {"1": 1}, [1, 3]])  # list test
+        self.assertEqual(json_helper.json_to_serialized('{\'list\': [1, 2], \'dict\': {}}'),
+                         {'list': [1, 2], 'dict': {}})  # dict test
+
+        ser_obj = serialization_helper.serialize_all([1, 2, 3])
+        ser_obj2 = serialization_helper.serialize_all(ser_obj)
+        ser_obj3 = serialization_helper.serialize_all(ser_obj2)
+        ser_json = json_helper.serialized_to_json(ser_obj3)
+        new_ser = json_helper.json_to_serialized(ser_json)
+        new_col = serialization_helper.deserialize_all(
+            serialization_helper.deserialize_all(
+                serialization_helper.deserialize_all(new_ser)))
+        self.assertEqual(new_col, [1, 2, 3])
 
 
 if __name__ == '__main__':
