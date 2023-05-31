@@ -7,18 +7,11 @@ def serialize_function(func):
     #   Serialize the function's code object to dictionary
     serialized_globals = {}
     for name, value in func.__globals__.items():
-        if isinstance(value, (int, float, str)):  # primitive globals
-            serialized_globals[name] = value
-        elif isinstance(value, types.ModuleType):  # module serialization
-            serialized_globals[name] = serialize_module(value)
-        elif name == func.__name__ and name in func.__code__.co_names:
+        if name == func.__name__ and name in func.__code__.co_names:
             # recursive call will be changed to new instance of function
             serialized_globals[name] = ""
-        elif isinstance(value, type) \
-                and name in func.__code__.co_names:  # global classes that need to be serialized
-            serialized_globals[name] = serialize_class(value)
-        elif callable(value) and name in func.__code__.co_names:  # global functions that need to be serialized
-            serialized_globals[name] = serialize_function(value)
+        elif name in func.__code__.co_names:
+            serialized_globals[name] = serialize_all(value)
 
     serialized_func = {
         '.type': "function",
@@ -39,9 +32,9 @@ def serialize_function(func):
         'freevars': func.__code__.co_freevars,  # vars used in internal functions
         'cellvars': func.__code__.co_cellvars,  # vars used in internal functions
 
-        'globals': serialized_globals,
-        'argdefs': func.__defaults__,
-        'closure': func.__closure__
+        'globals': serialized_globals,  # only globals that used in function
+        'argdefs': func.__defaults__,   # default values for function arguments
+        'closure': func.__closure__     # neccesary closure data for proper creation of functions
     }
 
     return serialized_func
@@ -73,12 +66,7 @@ def deserialize_function(serialized_func):
         if name == serialized_func['name']:
             recursive = True
         elif not isinstance(value, (int, float, str)):  # deserialization of the rest objects
-            if value['.type'] == "function":
-                serialized_func['globals'][name] = deserialize_function(value)
-            elif value['.type'] == "class":
-                serialized_func['globals'][name] = deserialize_class(value)
-            elif value['.type'] == "module":
-                serialized_func['globals'][name] = deserialize_module(value)
+            serialized_func['globals'][name] = deserialize_all(value)
 
     deserialized_func = types.FunctionType(
         deserialized_code,
@@ -100,17 +88,9 @@ def serialize_class(target):
     serialized_attrs = {}         # serialize attributes
 
     for name, value in target.__dict__.items():
-        if isinstance(value, (int, float, str)):
-            serialized_attrs[name] = value
-        elif isinstance(value, types.ModuleType):  # static module attribute
-            serialized_attrs[name] = serialize_module(value)
-        elif isinstance(value, type):               # static class attributes
-            serialized_attrs[name] = serialize_class(value)
-        elif callable(value):
-            serialized_attrs[name] = serialize_function(value)
-        elif name not in ("__dict__", "__weakref__", "__doc__"):
+        if name not in ("__dict__", "__weakref__", "__doc__"):
             # __dict__, __weakref__, __doc__ not needed for serialization
-            serialized_attrs[name] = serialize_object(value)
+            serialized_attrs[name] = serialize_all(value)
 
     serialized_bases = []           # serialize base classes
     for value in target.__bases__:
@@ -129,15 +109,7 @@ def serialize_class(target):
 def deserialize_class(serialized_target):
     # Deserialize the class object from dictionary
     for name, value in serialized_target["attrs"].items():
-        if not isinstance(value, (int, float, str)):
-            if value['.type'] == "function":
-                serialized_target["attrs"][name] = deserialize_function(value)
-            elif value['.type'] == "class":
-                serialized_target["attrs"][name] = deserialize_class(value)
-            elif value['.type'] == "object":
-                serialized_target["attrs"][name] = deserialize_object(value)
-            elif value['.type'] == "module":
-                serialized_target["attrs"][name] = deserialize_module(value)
+        serialized_target["attrs"][name] = deserialize_all(value)
 
     for i, value in enumerate(serialized_target["bases"]):
         serialized_target["bases"][i] = deserialize_class(value)
@@ -154,16 +126,7 @@ def serialize_object(obj):
 
     serialized_dict = {}
     for name, value in obj.__dict__.items():
-        if isinstance(value, (int, float, str)):
-            serialized_dict[name] = value
-        elif isinstance(value, types.ModuleType):
-            serialized_dict[name] = serialize_module(value)
-        elif isinstance(value, type):
-            serialized_dict[name] = serialize_class(value)
-        elif callable(value):
-            serialized_dict[name] = serialize_function(value)
-        else:
-            serialized_dict[name] = serialize_object(value)
+        serialized_dict[name] = serialize_all(value)
 
     serialized_obj = {
         ".type": 'object',
@@ -180,16 +143,7 @@ def deserialize_object(serialized_obj):
     obj = obj_class.__new__(obj_class)
 
     for name, value in serialized_obj["dict"].items():
-        if isinstance(value, (int, float, str)):
-            pass
-        elif value['.type'] == "function":
-            serialized_obj["dict"][name] = deserialize_function(value)
-        elif value['.type'] == "class":
-            serialized_obj["dict"][name] = deserialize_class(value)
-        elif value['.type'] == "object":
-            serialized_obj["dict"][name] = deserialize_object(value)
-        elif value['.type'] == "module":
-            serialized_obj["dict"][name] = deserialize_module(value)
+        serialized_obj["dict"][name] = deserialize_all(value)
 
     for name, value in serialized_obj["dict"].items():
         setattr(obj, name, value)
@@ -198,7 +152,6 @@ def deserialize_object(serialized_obj):
 
 def serialize_module(module):
     # Serialize module only by its name to dictionary
-
 
     serialized_module = {
         ".type": 'module',
