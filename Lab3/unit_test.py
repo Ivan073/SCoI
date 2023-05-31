@@ -122,7 +122,15 @@ class MyTestCase(unittest.TestCase):
 
         ser_obj = serialization_helper.serialize_all({"1": 1, "2": 2})
         new_col = serialization_helper.deserialize_all(ser_obj)
-        self.assertEqual(new_col, {"1": 1,"2": 2})  # dict test
+        self.assertEqual(new_col, {"1": 1, "2": 2})  # dict test
+
+        ser_obj = serialization_helper.serialize_all([1, 2, 3])
+        ser_obj2 = serialization_helper.serialize_all(ser_obj)
+        ser_obj3 = serialization_helper.serialize_all(ser_obj2)
+        new_col = serialization_helper.deserialize_all(
+            serialization_helper.deserialize_all(
+                serialization_helper.deserialize_all(ser_obj3)))
+        self.assertEqual(new_col, [1, 2, 3])  # multiple serialization test
 
 
 if __name__ == '__main__':
