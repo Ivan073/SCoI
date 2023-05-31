@@ -184,7 +184,7 @@ def serialize_all(obj):
 def deserialize_all(obj):
     if isinstance(obj, (int, float, str, type(None))):
         return obj
-    elif obj['.type'] in ["list", "bytes", "tuple", "dict", "set"]:
+    elif isinstance(obj, list) or obj['.type'] in ["bytes", "tuple", "dict", "set"]:
         return deserialize_collection(obj)
     elif obj['.type'] == "function":
         return deserialize_function(obj)
@@ -204,8 +204,6 @@ def serialize_collection(col):
     ser_col = []
     if isinstance(col, list):
         return col
-        #type = 'list'
-       # ser_col = [serialize_all(val) for val in col]
     elif isinstance(col, set):
         type = 'set'
         ser_col = [serialize_all(val) for val in col]
@@ -228,9 +226,8 @@ def serialize_collection(col):
 
 def deserialize_collection(serialized_col):
     # Deserialize collection as dictionary
-
-    if serialized_col['.type'] == "list":
-        return serialized_col['collection']
+    if isinstance(serialized_col, list):
+        return serialized_col
     elif serialized_col['.type'] == "set":
         return set(serialized_col['collection'])
     elif serialized_col['.type'] == "dict":
