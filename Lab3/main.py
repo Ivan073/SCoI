@@ -111,8 +111,12 @@ closure = outer_function(10)
 
 var = Person
 #print(var.items())
+"""  # вложенная сериализация
 ser_obj = serialize_all(var)
-print(ser_obj)
-new_obj = deserialize_all(ser_obj)
+ser_obj2 = serialize_all(ser_obj)
+ser_obj3 = serialize_all(ser_obj2)
+new_obj3 = deserialize_all(ser_obj3)
+new_obj2 = deserialize_all(new_obj3)
+new_obj = deserialize_all(new_obj2)
 print(new_obj)
-print(type(new_obj))
+"""
