@@ -99,6 +99,30 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(new_obj.obj_obj.b, new_obj.obj_obj.b)  # object object field test
         self.assertEqual(new_obj.obj_mod.cos(0), 1)  # object module field test
 
+    def test_collections(self):
+        ser_obj = serialization_helper.serialize_all([1,2,3])
+        new_col = serialization_helper.deserialize_all(ser_obj)
+        self.assertEqual(new_col, [1,2,3])  # list test
+
+        ser_obj = serialization_helper.serialize_all({1, 2, 3})
+        new_col = serialization_helper.deserialize_all(ser_obj)
+        self.assertEqual(new_col, {1, 2, 3})  # set test
+
+        ser_obj = serialization_helper.serialize_all(frozenset([1, 2, 3]))
+        new_col = serialization_helper.deserialize_all(ser_obj)
+        self.assertEqual(new_col, {1, 2, 3})  # frozenset test
+
+        ser_obj = serialization_helper.serialize_all((1, 2, 3))
+        new_col = serialization_helper.deserialize_all(ser_obj)
+        self.assertEqual(new_col, (1, 2, 3))  # tuple test
+
+        ser_obj = serialization_helper.serialize_all(bytes([1, 2, 3]))
+        new_col = serialization_helper.deserialize_all(ser_obj)
+        self.assertEqual(new_col, bytes([1, 2, 3]))  # bytes test
+
+        ser_obj = serialization_helper.serialize_all({"1": 1, "2": 2})
+        new_col = serialization_helper.deserialize_all(ser_obj)
+        self.assertEqual(new_col, {"1": 1,"2": 2})  # dict test
 
 
 if __name__ == '__main__':
