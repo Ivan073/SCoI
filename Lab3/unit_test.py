@@ -1,6 +1,7 @@
 import math
 import unittest
 import serialization_helper
+import json_helper
 
 
 class MyTestCase(unittest.TestCase):
@@ -131,6 +132,14 @@ class MyTestCase(unittest.TestCase):
             serialization_helper.deserialize_all(
                 serialization_helper.deserialize_all(ser_obj3)))
         self.assertEqual(new_col, [1, 2, 3])  # multiple serialization test
+
+    def test_json_helper(self):
+        self.assertEqual(json_helper.serialized_to_json(1), "1")  # int test
+        self.assertEqual(json_helper.serialized_to_json(3.67), "3.67")  # float test
+        self.assertEqual(json_helper.serialized_to_json("test"), "\'test\'")  # string test
+        self.assertEqual(json_helper.serialized_to_json(None), "null")  # null test
+        self.assertEqual(json_helper.serialized_to_json([1,2,3]), "[1, 2, 3]")  # list test
+        self.assertEqual(json_helper.serialized_to_json({"val":1 , "val2": 2}), "{\'val\': 1, \'val2\': 2}")  # dict test
 
 
 if __name__ == '__main__':
