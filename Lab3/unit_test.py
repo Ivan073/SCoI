@@ -173,5 +173,11 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(xml_helper.serialized_to_xml({"one": 1,"two": 2}),
                          "<dict><one><int>1</int></one><two><int>2</int></two></dict>")  # dict test
 
+
+        self.assertEqual(xml_helper.xml_to_serialized("<string><string></string><><<>>><<>></string>"),
+                         "<string></string><><<>>><<>>")  # string test
+        self.assertEqual(xml_helper.xml_to_serialized(
+            "<list><item><int>123</int></item><item><int>321</int></item></list>"), [123, 321])  # list test
+
 if __name__ == '__main__':
     unittest.main()

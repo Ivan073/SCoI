@@ -1,11 +1,7 @@
-import xml.etree.ElementTree as ET
+import re
 
-data = "Hello, world!"
+string = "apple pie, banana bread, cherry cobbler"
+pattern = r"(\w+)\s\1"
 
-root = ET.Element("root")
-child = ET.SubElement(root, "message")
-child.text = data
-
-xml_string = ET.tostring(root, encoding="unicode")
-
-print(xml_string)
+matches = re.findall(pattern, string)
+print(matches)
