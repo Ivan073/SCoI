@@ -238,15 +238,17 @@ def serialize_collection(col):
         ".type": type,
         "collection": ser_col,
     }
+    print(serialized_module)
     return serialized_module
 
 
 def deserialize_collection(serialized_col):
     # Deserialize collection as dictionary
-    serialized_col = [deserialize_all(val) for val in serialized_col]
     if isinstance(serialized_col, list):
-        return serialized_col
-    elif serialized_col['.type'] == "set":
+        return [deserialize_all(val) for val in serialized_col]
+
+    serialized_col['collection'] = deserialize_all(serialized_col['collection'])
+    if serialized_col['.type'] == "set":
         return set(serialized_col['collection'])
     elif serialized_col['.type'] == "frozenset":
         return frozenset(serialized_col['collection'])

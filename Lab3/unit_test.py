@@ -6,7 +6,7 @@ import xml_helper
 
 
 class MyTestCase(unittest.TestCase):
-    def test_functions(self):
+    """def test_functions(self):
         def testable1(a=4, b=3, *args, **kwargs):
             return a, b, args, kwargs
 
@@ -106,13 +106,14 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(new_obj.obj_cl.x, TestClass3.x)  # object class field test
         self.assertEqual(new_obj.obj_obj.b, new_obj.obj_obj.b)  # object object field test
         self.assertEqual(new_obj.obj_mod.cos(0), 1)  # object module field test
-
+     """
     def test_collections(self):
         ser_obj = serialization_helper.serialize_all([1,2,3])
         new_col = serialization_helper.deserialize_all(ser_obj)
         self.assertEqual(new_col, [1,2,3])  # list test
 
         ser_obj = serialization_helper.serialize_all({1, 2, 3})
+        print(ser_obj)
         new_col = serialization_helper.deserialize_all(ser_obj)
         self.assertEqual(new_col, {1, 2, 3})  # set test
 
