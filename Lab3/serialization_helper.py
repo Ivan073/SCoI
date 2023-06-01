@@ -13,10 +13,6 @@ def serialize_function(func):
         elif name in func.__code__.co_names:
             serialized_globals[name] = serialize_all(value)
 
-    print("name -- --", func.__name__)
-    print("cl", func.__closure__)
-    print("const", func.__code__.co_consts)
-
     serialized_func = {
         '.type': "function",
         'name': serialize_all(func.__name__),  # name of function
@@ -260,8 +256,6 @@ def deserialize_collection(serialized_col):
         return bytes(serialized_col['collection'])
 
 def serialize_cell(cell):
-    print("c", cell)
-    print("cc name", cell.cell_contents.__name__)
     serialized_cell = {
         ".type": 'cell',
         "value": serialize_all(cell.cell_contents),
@@ -272,8 +266,8 @@ def deserialize_cell(ser_cell):
 
 
 def serialize_code(code):
-    print('code', code)
     ser_code = {
+
         '.type': "code",
         'argcount': serialize_all(code.co_argcount),  # number of arguments
         'posonlyargcount': serialize_all(code.co_posonlyargcount),  # number of positional arguments
@@ -292,7 +286,6 @@ def serialize_code(code):
         'freevars': serialize_all(code.co_freevars),  # vars used in internal functions
         'cellvars': serialize_all(code.co_cellvars),  # vars used in internal functions
     }
-    print('endcode')
     return ser_code
 
 def deserialize_code(ser_code):
@@ -308,7 +301,7 @@ def deserialize_code(ser_code):
         deserialize_all(ser_code['names']),
         deserialize_all(ser_code['varnames']),
         deserialize_all(ser_code['filename']),
-        deserialize_all(ser_code['name']),
+        'code',
         deserialize_all(ser_code['firstlineno']),
         deserialize_all(ser_code['lnotab']),
         deserialize_all(ser_code['freevars']),
