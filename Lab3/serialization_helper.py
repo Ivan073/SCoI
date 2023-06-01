@@ -13,29 +13,34 @@ def serialize_function(func):
         elif name in func.__code__.co_names:
             serialized_globals[name] = serialize_all(value)
 
+    print("name -- --", func.__name__)
+    print("cl", func.__closure__)
+    print("const", func.__code__.co_consts)
+
     serialized_func = {
         '.type': "function",
-        'name': func.__name__,  # name of function
-        'argcount': func.__code__.co_argcount,  # number of arguments
-        'posonlyargcount': func.__code__.co_posonlyargcount,  # number of positional arguments
-        'kwonlyargcount': func.__code__.co_kwonlyargcount,  # number of key arguments
-        'nlocals': func.__code__.co_nlocals,  # number of locals
-        'stacksize': func.__code__.co_stacksize,  # potential used stack size (not useful)
-        'flags': func.__code__.co_flags,  # code state flags
-        'code': func.__code__.co_code,  # code of function as bytecode
-        'consts': func.__code__.co_consts,  # values of consts
-        'names': func.__code__.co_names,  # names of globals and attributes in function code (includes functions)
-        'varnames': func.__code__.co_varnames,  # names of variables
-        'filename': func.__code__.co_filename,  # name of file (not necessary)
-        'firstlineno': func.__code__.co_firstlineno,  # position in code (not necessary)
-        'lnotab': func.__code__.co_lnotab,  # offset info for bytecode
-        'freevars': func.__code__.co_freevars,  # vars used in internal functions
-        'cellvars': func.__code__.co_cellvars,  # vars used in internal functions
+        'name': serialize_all(func.__name__),  # name of function
+        'argcount': serialize_all(func.__code__.co_argcount),  # number of arguments
+        'posonlyargcount': serialize_all(func.__code__.co_posonlyargcount),  # number of positional arguments
+        'kwonlyargcount': serialize_all(func.__code__.co_kwonlyargcount),  # number of key arguments
+        'nlocals': serialize_all(func.__code__.co_nlocals),  # number of locals
+        'stacksize': serialize_all(func.__code__.co_stacksize),  # potential used stack size (not useful)
+        'flags': serialize_all(func.__code__.co_flags),  # code state flags
+        'code': serialize_all(func.__code__.co_code),  # code of function as bytecode
+        'consts': serialize_all(func.__code__.co_consts),  # values of consts
+        'names': serialize_all(func.__code__.co_names),  # names of globals and attributes in function code (includes functions)
+        'varnames': serialize_all(func.__code__.co_varnames),  # names of variables
+        'filename': serialize_all(func.__code__.co_filename),  # name of file (not necessary)
+        'firstlineno': serialize_all(func.__code__.co_firstlineno),  # position in code (not necessary)
+        'lnotab': serialize_all(func.__code__.co_lnotab),  # offset info for bytecode
+        'freevars': serialize_all(func.__code__.co_freevars),  # vars used in internal functions
+        'cellvars': serialize_all(func.__code__.co_cellvars),  # vars used in internal functions
 
         'globals': serialized_globals,  # only globals that used in function
-        'argdefs': func.__defaults__,   # default values for function arguments
-        'closure': func.__closure__     # neccesary closure data for proper creation of functions
+        'argdefs': serialize_all(func.__defaults__),   # default values for function arguments
+        'closure': serialize_all(func.__closure__)     # neccesary closure data for proper creation of functions
     }
+    print("endfunc")
 
     return serialized_func
 
@@ -43,22 +48,22 @@ def serialize_function(func):
 def deserialize_function(serialized_func):
     # Deserialize the function's code object from dictionary
     deserialized_code = types.CodeType(
-        serialized_func['argcount'],
-        serialized_func['posonlyargcount'],
-        serialized_func['kwonlyargcount'],
-        serialized_func['nlocals'],
-        serialized_func['stacksize'],
-        serialized_func['flags'],
-        serialized_func['code'],
-        serialized_func['consts'],
-        serialized_func['names'],
-        serialized_func['varnames'],
-        serialized_func['filename'],
-        serialized_func['name'],
-        serialized_func['firstlineno'],
-        serialized_func['lnotab'],
-        serialized_func['freevars'],
-        serialized_func['cellvars'],
+        deserialize_all(serialized_func['argcount']),
+        deserialize_all(serialized_func['posonlyargcount']),
+        deserialize_all(serialized_func['kwonlyargcount']),
+        deserialize_all(serialized_func['nlocals']),
+        deserialize_all(serialized_func['stacksize']),
+        deserialize_all(serialized_func['flags']),
+        deserialize_all(serialized_func['code']),
+        deserialize_all(serialized_func['consts']),
+        deserialize_all(serialized_func['names']),
+        deserialize_all(serialized_func['varnames']),
+        deserialize_all(serialized_func['filename']),
+        deserialize_all(serialized_func['name']),
+        deserialize_all(serialized_func['firstlineno']),
+        deserialize_all(serialized_func['lnotab']),
+        deserialize_all(serialized_func['freevars']),
+        deserialize_all(serialized_func['cellvars']),
     )
 
     recursive = False
@@ -71,9 +76,10 @@ def deserialize_function(serialized_func):
     deserialized_func = types.FunctionType(
         deserialized_code,
         globals=serialized_func['globals'],
-        name=serialized_func['name'],
-        argdefs=serialized_func['argdefs'],
-        closure=serialized_func['closure']
+        name=deserialize_all(serialized_func['name']),
+        argdefs=deserialize_all(serialized_func['argdefs']),
+        closure=deserialize_all(serialized_func['closure'])
+        #closure=()
     )
 
     if recursive:
@@ -123,7 +129,7 @@ def deserialize_class(serialized_target):
 
 def serialize_object(obj):
     # Serialize object (as class with data) to dictionary
-
+    print(obj)
     serialized_dict = {}
     for name, value in obj.__dict__.items():
         serialized_dict[name] = serialize_all(value)
@@ -169,7 +175,11 @@ def deserialize_module(serialized_module):
 def serialize_all(obj):
     if isinstance(obj, (int, float, str, complex, type(None))):  # primitive globals
         return obj
-    elif isinstance(obj, Iterable):
+    elif isinstance(obj, types.CellType):           # cell serialization
+        return serialize_cell(obj)
+    elif isinstance(obj, types.CodeType):           # code serialization
+        return serialize_code(obj)
+    elif isinstance(obj, Iterable):                 # collection serialization
         return serialize_collection(obj)
     elif isinstance(obj, types.ModuleType):  # module serialization
         return serialize_module(obj)
@@ -194,16 +204,19 @@ def deserialize_all(obj):
         return deserialize_object(obj)
     elif obj['.type'] == "module":
         return deserialize_module(obj)
+    elif obj['.type'] == "cell":
+        return deserialize_cell(obj)
+    elif obj['.type'] == "code":
+        return deserialize_code(obj)
     else:
         raise Exception("Wrong deserializable object")
 
 
 def serialize_collection(col):
     # Serialize collection as dictionary
-
     ser_col = []
     if isinstance(col, list):
-        return col
+        return [serialize_all(val) for val in col]
     elif isinstance(col, set):
         type = 'set'
         ser_col = [serialize_all(val) for val in col]
@@ -214,6 +227,7 @@ def serialize_collection(col):
         type = 'dict'
         ser_col = [[serialize_all(key), serialize_all(val)] for key, val in col.items()]
     elif isinstance(col, tuple):
+       # print("t",col)
         type = 'tuple'
         ser_col = [serialize_all(val) for val in col]
     elif isinstance(col, bytes):
@@ -229,6 +243,7 @@ def serialize_collection(col):
 
 def deserialize_collection(serialized_col):
     # Deserialize collection as dictionary
+    serialized_col = [deserialize_all(val) for val in serialized_col]
     if isinstance(serialized_col, list):
         return serialized_col
     elif serialized_col['.type'] == "set":
@@ -241,3 +256,60 @@ def deserialize_collection(serialized_col):
         return tuple(serialized_col['collection'])
     elif serialized_col['.type'] == "bytes":
         return bytes(serialized_col['collection'])
+
+def serialize_cell(cell):
+    print("c", cell)
+    print("cc name", cell.cell_contents.__name__)
+    serialized_cell = {
+        ".type": 'cell',
+        "value": serialize_all(cell.cell_contents),
+    }
+    return serialized_cell
+def deserialize_cell(ser_cell):
+    return types.CellType(deserialize_all(ser_cell['value']))
+
+
+def serialize_code(code):
+    print('code', code)
+    ser_code = {
+        '.type': "code",
+        'argcount': serialize_all(code.co_argcount),  # number of arguments
+        'posonlyargcount': serialize_all(code.co_posonlyargcount),  # number of positional arguments
+        'kwonlyargcount': serialize_all(code.co_kwonlyargcount),  # number of key arguments
+        'nlocals': serialize_all(code.co_nlocals),  # number of locals
+        'stacksize': serialize_all(code.co_stacksize),  # potential used stack size (not useful)
+        'flags': serialize_all(code.co_flags),  # code state flags
+        'code': serialize_all(code.co_code),  # code of function as bytecode
+        'consts': serialize_all(code.co_consts),  # values of consts
+        'names': serialize_all(code.co_names),
+        # names of globals and attributes in function code (includes functions)
+        'varnames': serialize_all(code.co_varnames),  # names of variables
+        'filename': serialize_all(code.co_filename),  # name of file (not necessary)
+        'firstlineno': serialize_all(code.co_firstlineno),  # position in code (not necessary)
+        'lnotab': serialize_all(code.co_lnotab),  # offset info for bytecode
+        'freevars': serialize_all(code.co_freevars),  # vars used in internal functions
+        'cellvars': serialize_all(code.co_cellvars),  # vars used in internal functions
+    }
+    print('endcode')
+    return ser_code
+
+def deserialize_code(ser_code):
+    deserialized_code = types.CodeType(
+        deserialize_all(ser_code['argcount']),
+        deserialize_all(ser_code['posonlyargcount']),
+        deserialize_all(ser_code['kwonlyargcount']),
+        deserialize_all(ser_code['nlocals']),
+        deserialize_all(ser_code['stacksize']),
+        deserialize_all(ser_code['flags']),
+        deserialize_all(ser_code['code']),
+        deserialize_all(ser_code['consts']),
+        deserialize_all(ser_code['names']),
+        deserialize_all(ser_code['varnames']),
+        deserialize_all(ser_code['filename']),
+        deserialize_all(ser_code['name']),
+        deserialize_all(ser_code['firstlineno']),
+        deserialize_all(ser_code['lnotab']),
+        deserialize_all(ser_code['freevars']),
+        deserialize_all(ser_code['cellvars']),
+    )
+    return deserialized_code

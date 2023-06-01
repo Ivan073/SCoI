@@ -1,3 +1,6 @@
+from serialization_helper import serialize_all, deserialize_all
+
+
 def serialized_to_json(obj):
     result = ""
     if isinstance(obj, str):
@@ -128,3 +131,19 @@ def json_to_serialized(data):
             result[name] = json_to_serialized(substr)
             index += 3  # ", '" symbols
         return result
+
+def full_serialization(obj):
+    return serialized_to_json(serialize_all(obj))
+
+def full_deserialization(obj):
+    return deserialize_all(json_to_serialized(obj))
+
+def write(obj, fp):
+    with open(fp, 'w') as f:
+        f.write(serialized_to_json(serialize_all(obj)))
+
+
+def read(fp):
+    with open(fp, 'r') as f:
+        return deserialize_all(json_to_serialized(f.read()))
+

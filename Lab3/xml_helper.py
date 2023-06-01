@@ -1,8 +1,11 @@
 import re
 
+from serialization_helper import serialize_all, deserialize_all
+
 
 def serialized_to_xml(obj):
     result = ""
+    #print("o", obj)
     if isinstance(obj, str):
         result = '<string>' + obj + '</string>'
     elif isinstance(obj, type(None)):
@@ -29,7 +32,9 @@ def serialized_to_xml(obj):
 
 
 def xml_to_serialized(data):
+    print("d", data)
     name = re.split(r"[<>]", data)[1]
+    #print('pass')
     if name == "string":
         return data[len("<string>"):-len("</string>")]
     if name == "int":
@@ -95,3 +100,17 @@ def xml_to_serialized(data):
             index += 1
         return result
 
+def full_serialization(obj):
+    return serialized_to_xml(serialize_all(obj))
+
+def full_deserialization(obj):
+    return deserialize_all(xml_to_serialized(obj))
+
+def write(obj, fp):
+    with open(fp, 'w') as f:
+        f.write(serialized_to_xml(serialize_all(obj)))
+
+
+def read(obj, fp):
+    with open(fp, 'r') as f:
+        return deserialize_all(xml_to_serialized(f.read()))
