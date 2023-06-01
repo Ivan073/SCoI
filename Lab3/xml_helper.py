@@ -5,7 +5,6 @@ from serialization_helper import serialize_all, deserialize_all
 
 def serialized_to_xml(obj):
     result = ""
-    #print("o", obj)
     if isinstance(obj, str):
         result = '<string>' + obj + '</string>'
     elif isinstance(obj, type(None)):
@@ -32,9 +31,7 @@ def serialized_to_xml(obj):
 
 
 def xml_to_serialized(data):
-    print("d", data)
     name = re.split(r"[<>]", data)[1]
-    #print('pass')
     if name == "string":
         return data[len("<string>"):-len("</string>")]
     if name == "int":

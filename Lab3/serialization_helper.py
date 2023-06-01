@@ -112,9 +112,10 @@ def deserialize_function(serialized_func):
 
 def serialize_class(target):
     # Serialize the class object to dictionary
-
+    print(target)
     serialized_attrs = {}         # serialize attributes
 
+    print(target.__dict__)
     for name, value in target.__dict__.items():
         if name not in ("__dict__", "__weakref__", "__doc__"):
             # __dict__, __weakref__, __doc__ not needed for serialization
@@ -151,6 +152,8 @@ def deserialize_class(serialized_target):
 
 def serialize_object(obj):
     # Serialize object (as class with data) to dictionary
+    # print(type(obj))
+    # print(type(obj).__bases__)
     serialized_dict = {}
     for name, value in obj.__dict__.items():
         serialized_dict[name] = serialize_all(value)
@@ -196,6 +199,8 @@ def deserialize_module(serialized_module):
 def serialize_all(obj):
     if isinstance(obj, (int, float, str, complex, type(None))):  # primitive globals
         return obj
+    elif isinstance(obj, classmethod):           # classmethod serialization
+        return serialize_classmethod(obj)
     elif isinstance(obj, types.CellType):           # cell serialization
         return serialize_cell(obj)
     elif isinstance(obj, types.CodeType):           # code serialization
@@ -229,6 +234,8 @@ def deserialize_all(obj):
         return deserialize_cell(obj)
     elif obj['.type'] == "code":
         return deserialize_code(obj)
+    elif obj['.type'] == "classmethod":
+        return deserialize_classmethod(obj)
     else:
         raise Exception("Wrong deserializable object")
 
@@ -331,3 +338,16 @@ def deserialize_code(ser_code):
         deserialize_all(ser_code['cellvars']),
     )
     return deserialized_code
+
+def serialize_classmethod(method):
+    ser_method = {
+
+        '.type': "classmethod",
+        'function': serialize_all(method.__func__)
+    }
+    return ser_method
+
+def deserialize_classmethod(ser_method):
+    func = deserialize_all(ser_method['function'])
+    func = classmethod(func)
+    return func
