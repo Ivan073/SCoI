@@ -173,11 +173,22 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(xml_helper.serialized_to_xml({"one": 1,"two": 2}),
                          "<dict><one><int>1</int></one><two><int>2</int></two></dict>")  # dict test
 
-
+        self.assertEqual(xml_helper.xml_to_serialized("<int>1</int>"),
+                         1)  # int test
+        self.assertEqual(xml_helper.xml_to_serialized("<float>5.55</float>"),
+                         5.55)  # float test
+        self.assertEqual(xml_helper.xml_to_serialized("<bool>False</bool>"),
+                         False)  # bool test
         self.assertEqual(xml_helper.xml_to_serialized("<string><string></string><><<>>><<>></string>"),
                          "<string></string><><<>>><<>>")  # string test
         self.assertEqual(xml_helper.xml_to_serialized(
             "<list><item><int>123</int></item><item><int>321</int></item></list>"), [123, 321])  # list test
+        self.assertEqual(xml_helper.xml_to_serialized(              # list of lists test
+            "<list><item><list><item><int>123</int></item></list></item></list>"), [[123]])
+        self.assertEqual(xml_helper.xml_to_serialized(  # dict test
+            "<dict><item><int>123</int></item><item2><int>321</int></item2></dict>"), {'item2': 321, 'item':123})
+        self.assertEqual(xml_helper.xml_to_serialized(  # list in dict test
+            "<dict><my_list><list><item><int>123</int></item></list></my_list></dict>"), {'my_list': [123]})
 
 if __name__ == '__main__':
     unittest.main()
