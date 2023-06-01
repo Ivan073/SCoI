@@ -2,6 +2,7 @@ import math
 import unittest
 import serialization_helper
 import json_helper
+import xml_helper
 
 
 class MyTestCase(unittest.TestCase):
@@ -162,6 +163,15 @@ class MyTestCase(unittest.TestCase):
                 serialization_helper.deserialize_all(new_ser)))
         self.assertEqual(new_col, [1, 2, 3])
 
+    def test_xml_helper(self):
+        self.assertEqual(xml_helper.serialized_to_xml(1), "<int>1</int>")  # int test
+        self.assertEqual(xml_helper.serialized_to_xml(3.67), "<float>3.67</float>")  # float test
+        self.assertEqual(xml_helper.serialized_to_xml("test"), "<string>test</string>")  # string test
+        self.assertEqual(xml_helper.serialized_to_xml(None), "<null />")  # null test
+        self.assertEqual(xml_helper.serialized_to_xml([1, 2, 3]),        # list test
+                         "<list><item><int>1</int></item><item><int>2</int></item><item><int>3</int></item></list>")
+        self.assertEqual(xml_helper.serialized_to_xml({"one": 1,"two": 2}),
+                         "<dict><one><int>1</int></one><two><int>2</int></two></dict>")  # dict test
 
 if __name__ == '__main__':
     unittest.main()
