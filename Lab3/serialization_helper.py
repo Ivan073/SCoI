@@ -152,8 +152,11 @@ def deserialize_class(serialized_target):
 
 def serialize_object(obj):
     # Serialize object (as class with data) to dictionary
-    # print(type(obj))
-    # print(type(obj).__bases__)
+    if isinstance(obj, property):
+        print("fget",obj.fget)
+    print(obj)
+    print(type(obj))
+    print(type(obj).__bases__)
     serialized_dict = {}
     for name, value in obj.__dict__.items():
         serialized_dict[name] = serialize_all(value)
@@ -199,6 +202,10 @@ def deserialize_module(serialized_module):
 def serialize_all(obj):
     if isinstance(obj, (int, float, str, complex, type(None))):  # primitive globals
         return obj
+    elif isinstance(obj, property):           # property serialization
+        return serialize_property(obj)
+    elif isinstance(obj, staticmethod):           # staticmethod serialization
+        return serialize_staticmethod(obj)
     elif isinstance(obj, classmethod):           # classmethod serialization
         return serialize_classmethod(obj)
     elif isinstance(obj, types.CellType):           # cell serialization
@@ -236,6 +243,10 @@ def deserialize_all(obj):
         return deserialize_code(obj)
     elif obj['.type'] == "classmethod":
         return deserialize_classmethod(obj)
+    elif obj['.type'] == "staticmethod":
+        return deserialize_staticmethod(obj)
+    elif obj['.type'] == "property":
+        return deserialize_property(obj)
     else:
         raise Exception("Wrong deserializable object")
 
@@ -285,12 +296,15 @@ def deserialize_collection(serialized_col):
     elif serialized_col['.type'] == "bytes":
         return bytes(serialized_col['collection'])
 
+
 def serialize_cell(cell):
     serialized_cell = {
         ".type": 'cell',
         "value": serialize_all(cell.cell_contents),
     }
     return serialized_cell
+
+
 def deserialize_cell(ser_cell):
     return types.CellType(deserialize_all(ser_cell['value']))
 
@@ -350,4 +364,32 @@ def serialize_classmethod(method):
 def deserialize_classmethod(ser_method):
     func = deserialize_all(ser_method['function'])
     func = classmethod(func)
+    return func
+
+
+def serialize_staticmethod(method):
+    ser_method = {
+        '.type': "staticmethod",
+        'function': serialize_all(method.__func__)
+    }
+    return ser_method
+
+
+def deserialize_staticmethod(ser_method):
+    func = deserialize_all(ser_method['function'])
+    func = staticmethod(func)
+    return func
+
+
+def serialize_property(prop):
+    ser_method = {
+        '.type': "property",
+        'function': serialize_all(prop.fget)
+    }
+    return ser_method
+
+
+def deserialize_property(ser_prop):
+    func = deserialize_all(ser_prop['function'])
+    func = property(func)
     return func
