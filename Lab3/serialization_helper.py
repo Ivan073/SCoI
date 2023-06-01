@@ -13,6 +13,17 @@ def serialize_function(func):
         elif name in func.__code__.co_names:
             serialized_globals[name] = serialize_all(value)
 
+    closure = func.__closure__
+    new_cl = []
+    if isinstance(closure, Iterable):
+        for cell in closure:
+            if cell.cell_contents != func:
+                new_cl.append(cell)
+            else:
+                new_cl.append(types.CellType(None))
+        closure = tuple(new_cl)
+    ser_closure = serialize_all(closure)
+
     serialized_func = {
         '.type': "function",
         'name': serialize_all(func.__name__),  # name of function
@@ -34,9 +45,8 @@ def serialize_function(func):
 
         'globals': serialized_globals,  # only globals that used in function
         'argdefs': serialize_all(func.__defaults__),   # default values for function arguments
-        'closure': serialize_all(func.__closure__)     # neccesary closure data for proper creation of functions
+        'closure': ser_closure     # neccesary closure data for proper creation of functions
     }
-    print("endfunc")
 
     return serialized_func
 
@@ -69,14 +79,30 @@ def deserialize_function(serialized_func):
         elif not isinstance(value, (int, float, str)):  # deserialization of the rest objects
             serialized_func['globals'][name] = deserialize_all(value)
 
+    recursive_closure = False
+    closure = deserialize_all(serialized_func['closure'])
+    if closure is not None:
+        for cell in closure:
+            if cell.cell_contents is None:
+                recursive_closure = True
+
     deserialized_func = types.FunctionType(
         deserialized_code,
         globals=serialized_func['globals'],
         name=deserialize_all(serialized_func['name']),
         argdefs=deserialize_all(serialized_func['argdefs']),
-        closure=deserialize_all(serialized_func['closure'])
-        #closure=()
+        closure=closure
     )
+
+
+    if recursive_closure:
+        new_cl = []
+        for cell in deserialized_func.__closure__:
+            if cell.cell_contents is not None:
+                new_cl.append(cell)
+            else:
+                cell.cell_contents = deserialized_func
+
 
     if recursive:
         deserialized_func.__globals__[serialized_func['name']] = deserialized_func
@@ -125,7 +151,6 @@ def deserialize_class(serialized_target):
 
 def serialize_object(obj):
     # Serialize object (as class with data) to dictionary
-    print(obj)
     serialized_dict = {}
     for name, value in obj.__dict__.items():
         serialized_dict[name] = serialize_all(value)
@@ -223,7 +248,6 @@ def serialize_collection(col):
         type = 'dict'
         ser_col = [[serialize_all(key), serialize_all(val)] for key, val in col.items()]
     elif isinstance(col, tuple):
-       # print("t",col)
         type = 'tuple'
         ser_col = [serialize_all(val) for val in col]
     elif isinstance(col, bytes):
@@ -234,7 +258,6 @@ def serialize_collection(col):
         ".type": type,
         "collection": ser_col,
     }
-    print(serialized_module)
     return serialized_module
 
 
