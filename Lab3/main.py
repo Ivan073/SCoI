@@ -1,5 +1,4 @@
-import math
-from collections.abc import Iterable
+"""import math
 
 from MySerializer import MySerializer
 
@@ -89,7 +88,34 @@ def a(x):
     yield x[0]
     x[1] += 2
     yield
+"""
 
+import argparse
+
+from console_util import parse_args
+
+"""
+from MySerializer import MySerializer
+var = [[1, 2], 'te,st', {'1': 1}, [1, 3]]
+ser = MySerializer.createSerializer('.json')
+ser.dump(var, 'data_from.txt')
+"""
+
+"""
+import configparser
+config = configparser.ConfigParser()
+config.add_section('section')
+config.set('section', 'util_name', 'util')
+config.set('section', 'file_from', 'data_from.txt')
+config.set('section', 'file_to', 'data_to.txt')
+config.set('section', 'format_from', '.json')
+config.set('section', 'format_to', '.xml')
+with open('config.ini', 'w') as configfile:
+    config.write(configfile)
+"""
+
+
+parse_args()
 
 
 

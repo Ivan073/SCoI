@@ -112,10 +112,8 @@ def deserialize_function(serialized_func):
 
 def serialize_class(target):
     # Serialize the class object to dictionary
-    print(target)
     serialized_attrs = {}         # serialize attributes
 
-    print(target.__dict__)
     for name, value in target.__dict__.items():
         if name not in ("__dict__", "__weakref__", "__doc__"):
             # __dict__, __weakref__, __doc__ not needed for serialization
@@ -152,11 +150,6 @@ def deserialize_class(serialized_target):
 
 def serialize_object(obj):
     # Serialize object (as class with data) to dictionary
-    if isinstance(obj, property):
-        print("fget",obj.fget)
-    print(obj)
-    print(type(obj))
-    print(type(obj).__bases__)
     serialized_dict = {}
     for name, value in obj.__dict__.items():
         serialized_dict[name] = serialize_all(value)
