@@ -195,6 +195,8 @@ def deserialize_module(serialized_module):
 def serialize_all(obj):
     if isinstance(obj, (int, float, str, complex, type(None))):  # primitive globals
         return obj
+    elif isinstance(obj, types.GeneratorType):           # generator serialization
+        return serialize_generator(obj)
     elif isinstance(obj, property):           # property serialization
         return serialize_property(obj)
     elif isinstance(obj, staticmethod):           # staticmethod serialization
@@ -240,6 +242,8 @@ def deserialize_all(obj):
         return deserialize_staticmethod(obj)
     elif obj['.type'] == "property":
         return deserialize_property(obj)
+    elif obj['.type'] == "generator":
+        return deserialize_generator(obj)
     else:
         raise Exception("Wrong deserializable object")
 
@@ -346,6 +350,7 @@ def deserialize_code(ser_code):
     )
     return deserialized_code
 
+
 def serialize_classmethod(method):
     ser_method = {
 
@@ -353,6 +358,7 @@ def serialize_classmethod(method):
         'function': serialize_all(method.__func__)
     }
     return ser_method
+
 
 def deserialize_classmethod(ser_method):
     func = deserialize_all(ser_method['function'])
@@ -386,3 +392,17 @@ def deserialize_property(ser_prop):
     func = deserialize_all(ser_prop['function'])
     func = property(func)
     return func
+
+
+def serialize_generator(gen):
+    ser_gen = {
+        '.type': "generator",
+        'collection': serialize_all(list(gen))
+    }
+    return ser_gen
+
+
+def deserialize_generator(ser_gen):
+    col = deserialize_all(ser_gen['collection'])
+    gen = (x for x in col)
+    return gen

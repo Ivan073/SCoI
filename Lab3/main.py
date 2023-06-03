@@ -79,9 +79,9 @@ def f(a):
 
 g = f([1, 2, 3])
 print(next(g))
-#g_s = ser.dumps(g)
-#g_d = ser.loads(g_s)
-#print(next(g_d))
+g_s = ser.dumps(g)
+g_d = ser.loads(g_s)
+print(next(g_d))
 
 
 def a(x):
@@ -94,14 +94,14 @@ import argparse
 
 from console_util import parse_args
 
-"""
+"""  # json test data initializtion
 from MySerializer import MySerializer
 var = [[1, 2], 'te,st', {'1': 1}, [1, 3]]
 ser = MySerializer.createSerializer('.json')
 ser.dump(var, 'data_from.txt')
 """
 
-"""
+""" # config initialization
 import configparser
 config = configparser.ConfigParser()
 config.add_section('section')
