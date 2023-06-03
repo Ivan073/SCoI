@@ -37,11 +37,7 @@ def is_float(string):
 
 
 def is_int(string):
-    try:
-        int(string)
-        return True
-    except ValueError:
-        return False
+    return string.isdigit()
 
 
 def json_to_serialized(data):
@@ -49,10 +45,10 @@ def json_to_serialized(data):
         return None
     elif data[0] == '\'' and data[-1] == '\'':
         return data[1:-1]
-    elif is_float(data):
-        return float(data)
     elif is_int(data):
         return int(data)
+    elif is_float(data):
+        return float(data)
     elif data == 'True':
         return True
     elif data == 'False':
