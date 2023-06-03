@@ -3,9 +3,6 @@
 from MySerializer import MySerializer
 
 
-#from MySerializer.MySerializer import MySerializer
-
-
 def my_decor(meth):
     def inner(*args, **kwargs):
         print('I am in my_decor')
