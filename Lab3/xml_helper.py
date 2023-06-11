@@ -108,6 +108,6 @@ def write(obj, fp):
         f.write(serialized_to_xml(serialize_all(obj)))
 
 
-def read(obj, fp):
+def read(fp):
     with open(fp, 'r') as f:
         return deserialize_all(xml_to_serialized(f.read()))
