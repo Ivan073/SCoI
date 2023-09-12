@@ -142,7 +142,7 @@ def room_view(request, id):
 
 @login_required
 def booking_view(request, id):
-    logger.info("Booking room " + id + " page")
+    logger.info("Booking room " + str(id) + " page")
     room = Room.objects.get(id=id)
     min_date = max(room.free_date,datetime.date(datetime.today()+timedelta(days=1)))
     max_date = min_date + timedelta(days=30)
