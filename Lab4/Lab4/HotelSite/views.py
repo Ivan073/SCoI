@@ -136,7 +136,7 @@ def geo_view(request):
     return render(request, "place.html",context=context)
 
 def room_view(request, id):
-    logger.info("Room "+id+" page")
+    logger.info("Room "+str(id)+" page")
     room = Room.objects.get(id=id)
     return render(request, 'room.html', {'room': room, "user":request.user,"tomorrow":datetime.today()+timedelta(days=1),})
 
@@ -215,7 +215,6 @@ def statistics_view(request):
     booking_amount = len(Booking.objects.all())
     client_amount = len(Client.objects.all())
     room_amount = len(Room.objects.all())
-    logger.warning(graph_data)
     context = {
         "user": request.user,
         "rooms_by_price": rooms,
